@@ -1,0 +1,44 @@
+# Local three-tier stack: browser -> app container -> PostgreSQL container.
+# Values come from .env in this folder (copy .env.example to .env first).
+name: shop
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${PGDATABASE:-shop}
+      POSTGRES_USER: ${PGUSER:-shop}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?Set PGPASSWORD in .env (copy .env.example to .env)}
+    # 127.0.0.1 = reachable only from this computer, not from your network.
+    # Host port comes from PGPORT (default 5433, so it doesn't clash with
+    # another PostgreSQL already using 5432). Inside Docker it is always 5432.
+    ports:
+      - "127.0.0.1:${PGPORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: ./app
+    environment:
+      PORT: "3000"
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: ${PGDATABASE:-shop}
+      PGUSER: ${PGUSER:-shop}
+      PGPASSWORD: ${PGPASSWORD:?Set PGPASSWORD in .env (copy .env.example to .env)}
+      RUN_MIGRATIONS: "true"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    # Open http://localhost:8080 (change APP_PORT in .env if 8080 is taken).
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

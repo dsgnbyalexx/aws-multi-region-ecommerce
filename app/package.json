@@ -1,0 +1,27 @@
+{
+  "name": "shop-api",
+  "version": "0.1.0",
+  "description": "Three-tier e-commerce API (Node.js + PostgreSQL) for the aws-multi-region-ecommerce portfolio project",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "migrate": "node --env-file-if-exists=../.env src/migrate.js",
+    "test": "node --test test/unit/*.test.js",
+    "test:integration": "node --env-file-if-exists=../.env --test --test-concurrency=1 test/integration/*.test.js",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "supertest": "^7.3.1"
+  }
+}
