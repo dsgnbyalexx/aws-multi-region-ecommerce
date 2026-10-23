@@ -1,0 +1,54 @@
+#!/bin/bash
+# Runs once, as root, when each EC2 instance first boots.
+# Terraform fills in the $${...} placeholders; plain $VARS are shell variables.
+#
+# STATUS: written and syntax-checked, NOT yet executed on a real instance.
+set -euo pipefail
+
+REGION="${region}"
+
+# 1. Install Docker and jq (JSON tool), start Docker on every boot.
+dnf install -y docker jq
+systemctl enable --now docker
+
+# 2. Amazon's CA bundle so the app can verify the database's TLS certificate.
+mkdir -p /opt/shop
+curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o /opt/shop/rds-ca.pem
+chmod 644 /opt/shop/rds-ca.pem
+
+# 3. Read the RDS-managed credentials from Secrets Manager (allowed by the
+#    instance's IAM role; no password is stored in Terraform or user data).
+SECRET_JSON=$(aws secretsmanager get-secret-value --region "$REGION" \
+  --secret-id "${db_secret_arn}" --query SecretString --output text)
+DB_USER=$(echo "$SECRET_JSON" | jq -r .username)
+DB_PASS=$(echo "$SECRET_JSON" | jq -r .password)
+
+# 4. Write the app's settings to a root-only file (umask 077 = owner-only).
+umask 077
+cat > /opt/shop/app.env <<EOF
+NODE_ENV=production
+PORT=${app_port}
+PGHOST=${db_host}
+PGPORT=${db_port}
+PGDATABASE=${db_name}
+PGUSER=$DB_USER
+PGPASSWORD=$DB_PASS
+PGSSLMODE=verify-full
+NODE_EXTRA_CA_CERTS=/certs/rds-ca.pem
+RUN_MIGRATIONS=true
+LOG_LEVEL=info
+EOF
+umask 022
+
+# 5. Log in to the private container registry and start the app.
+aws ecr get-login-password --region "$REGION" \
+  | docker login --username AWS --password-stdin "${registry}"
+
+docker run -d --name shop --restart unless-stopped \
+  -p ${app_port}:${app_port} \
+  --env-file /opt/shop/app.env \
+  -v /opt/shop/rds-ca.pem:/certs/rds-ca.pem:ro \
+  --log-driver awslogs \
+  --log-opt awslogs-region="$REGION" \
+  --log-opt awslogs-group="${log_group}" \
+  "${image}"

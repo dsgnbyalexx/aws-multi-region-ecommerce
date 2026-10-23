@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars (git-ignored) and adjust before a real deployment:
+#   cp terraform.tfvars.example terraform.tfvars
+
+app_image_tag = "replace-with-git-sha"
+
+# Restrict the load balancer to your own public IP while testing.
+# Find it with: curl https://checkip.amazonaws.com
+allowed_ingress_cidrs = ["203.0.113.10/32"]
+
+# Get an email when spend passes 50% of the budget, or is forecast to pass 100%.
+budget_alert_email = "you@example.com"
+monthly_budget_usd = 20
