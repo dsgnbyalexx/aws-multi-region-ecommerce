@@ -1,0 +1,28 @@
+﻿✔ GET /health returns 200 even when the database is down (151.6264ms)
+✔ GET /ready returns 200 when the database answers (23.9161ms)
+✔ GET /ready returns 503 when the database is unreachable (22.2075ms)
+✔ GET /ready returns 503 while shutting down (16.5337ms)
+✔ every response carries a request id, and a supplied one is echoed back (25.7967ms)
+✔ request logs record the full original path, not the router-relative one (17.958ms)
+✔ POST /api/orders rejects invalid JSON with 400 (48.303ms)
+✔ POST /api/orders rejects an invalid order before touching the database (16.717ms)
+✔ GET /api/products/abc returns 400 for a non-numeric id (14.6005ms)
+✔ unexpected errors return a generic 500 without leaking details (15.2683ms)
+✔ unknown routes return a JSON 404 (15.3018ms)
+✔ the X-Powered-By header is not sent (15.5472ms)
+✔ accepts a valid order and normalises the email (6.0533ms)
+✔ strips unexpected fields from items (0.7939ms)
+✔ rejects non-object bodies (0.6683ms)
+✔ rejects missing or malformed email (0.6413ms)
+✔ rejects empty, missing and oversized item lists (1.0737ms)
+✔ rejects bad quantities (0.4292ms)
+✔ rejects bad and duplicate product ids (0.7107ms)
+✔ parseId accepts only positive integers within INTEGER range (0.7288ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1417.9014

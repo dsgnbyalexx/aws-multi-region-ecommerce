@@ -1,0 +1,3 @@
+﻿NAME         IMAGE                STATUS                    PORTS
+shop-app-1   shop-app             Up 37 seconds (healthy)   127.0.0.1:8080->3000/tcp
+shop-db-1    postgres:17-alpine   Up 5 minutes (healthy)    127.0.0.1:5433->5432/tcp

@@ -1,0 +1,16 @@
+﻿✔ migrations are idempotent (running twice changes nothing) (161.7737ms)
+✔ GET /ready reports the database as reachable (59.9715ms)
+✔ GET /api/products lists seeded and test products (49.9486ms)
+✔ GET /api/products/:id returns 404 for a missing product (25.9489ms)
+✔ placing an order saves it, computes the total and reduces stock (99.2325ms)
+✔ insufficient stock returns 409 and rolls back the WHOLE order (37.5019ms)
+✔ ordering an unknown product returns 404 and changes nothing (29.28ms)
+✔ concurrent orders never oversell the last items (167.2085ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1733.9095
