@@ -1,0 +1,12 @@
+# Terraform static validation, 2026-10-23T16:15Z. Nothing was deployed; no AWS credentials were used.
+
+$ terraform version
+Terraform v1.16.6
+on windows_amd64
+
+$ terraform fmt -check -recursive   (exit code 0 = all files correctly formatted)
+exit code: 0
+
+$ terraform validate   (in terraform/envs/dev)
+Success! The configuration is valid.
+

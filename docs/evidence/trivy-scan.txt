@@ -1,0 +1,24 @@
+# Trivy 0.76.1 IaC misconfiguration scan of terraform/ (static, nothing deployed).
+# Triage and reasons for accepted findings: docs/architecture.md#security-scan-triage
+
+envs/dev/main.tf (terraform)
+Tests: 1 (SUCCESSES: 0, FAILURES: 1)
+Failures: 1 (UNKNOWN: 0, LOW: 1, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+AWS-0033 (LOW): Repository is not encrypted using KMS.
+modules/app/main.tf (terraform)
+Tests: 1 (SUCCESSES: 0, FAILURES: 1)
+Failures: 1 (UNKNOWN: 0, LOW: 1, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+AWS-0017 (LOW): Log group is not encrypted.
+modules/database/main.tf (terraform)
+Tests: 3 (SUCCESSES: 0, FAILURES: 3)
+Failures: 3 (UNKNOWN: 0, LOW: 1, MEDIUM: 2, HIGH: 0, CRITICAL: 0)
+AWS-0133 (LOW): Instance does not have performance insights enabled.
+AWS-0176 (MEDIUM): Instance does not have IAM Authentication enabled
+AWS-0177 (MEDIUM): Instance does not have Deletion Protection enabled
+modules/network/main.tf (terraform)
+Tests: 1 (SUCCESSES: 0, FAILURES: 1)
+Failures: 1 (UNKNOWN: 0, LOW: 1, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+AWS-0017 (LOW): Log group is not encrypted.
+
+$ trivy config --severity HIGH,CRITICAL --exit-code 1 terraform/
+exit code: 0 (0 = no unaccepted HIGH/CRITICAL findings)

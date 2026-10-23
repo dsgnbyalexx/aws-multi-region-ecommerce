@@ -17,12 +17,36 @@
 | Unit tests (20) and integration tests against real PostgreSQL (8) | ✅ Passing locally | [evidence log](docs/evidence/README.md) |
 | Oversell protection under concurrent orders | ✅ Tested, plus a negative-control experiment | [Experiment 1](docs/evidence/README.md#experiment-1-does-the-concurrency-test-actually-detect-overselling) |
 | Graceful shutdown on SIGTERM | ✅ Tested locally | [Experiment 2](docs/evidence/README.md#experiment-2-graceful-shutdown-on-sigterm) |
-| Terraform modules (VPC, ALB, ASG, RDS), validated but not deployed | ⏳ Planned | — |
+| Terraform modules (VPC, ALB, ASG, RDS), statically validated, **not deployed** | ✅ Validated | [terraform-validate.txt](docs/evidence/terraform-validate.txt), [architecture](docs/architecture.md) |
+| IaC security scan (Trivy): 0 unaccepted HIGH/CRITICAL findings | ✅ Scanned | [trivy-scan.txt](docs/evidence/trivy-scan.txt), [triage](docs/architecture.md#security-scan-triage) |
 | GitHub Actions CI | ⏳ Planned | — |
 | AWS deployment (us-east-1) | 🗺️ Future | — |
 | Cross-region DR (us-west-2) + Route 53 failover | 🗺️ Future | — |
 
 **Legend:** ✅ implemented & verified · 🧪 simulated locally · ⏳ planned for this phase · 🗺️ future enhancement
+
+## AWS architecture (designed, not deployed)
+
+```mermaid
+flowchart LR
+    user([Browser]) --> alb["ALB<br/>public subnets"]
+    alb --> asg["Auto Scaling group<br/>EC2 + Docker, 2 AZs<br/>private subnets"]
+    asg --> rds[("RDS PostgreSQL 17<br/>private DB subnets")]
+    asg -.-> sm[Secrets Manager]
+    asg -.-> ecr[ECR]
+```
+
+The Terraform in [`terraform/`](terraform/) describes this stack in four modules (network,
+security, database, app). It passes `terraform validate` and a Trivy security scan, but it
+has **not been applied to AWS**. The full design (security model, design decisions,
+disaster-recovery plan, and **cost estimate of roughly $0.13/hour while running**) is in
+[docs/architecture.md](docs/architecture.md).
+
+```bash
+cd terraform/envs/dev
+terraform init -backend=false
+terraform validate        # static check only; creates nothing, needs no AWS account
+```
 
 ## What the application does
 
@@ -101,6 +125,9 @@ docker compose down -v      # also delete the database volume
 │   ├── test/unit/      # Fast tests with a fake database
 │   ├── test/integration/  # Tests against real PostgreSQL
 │   └── Dockerfile
+├── terraform/
+│   ├── modules/        # network, security, database, app (reusable)
+│   └── envs/dev/       # dev environment wiring the modules together
 ├── docker-compose.yml  # Local three-tier stack
 └── docs/evidence/      # Real test output, screenshots, experiment results
 ```

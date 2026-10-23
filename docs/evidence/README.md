@@ -65,6 +65,21 @@ where old instances are stopped while traffic drains.
 
 ---
 
+## 2026-10-23: Terraform static validation (nothing deployed)
+
+| Check | Tool | Result | Raw output |
+|---|---|---|---|
+| Formatting | `terraform fmt -check -recursive` | Pass | [terraform-validate.txt](terraform-validate.txt) |
+| Configuration validity | `terraform validate` (Terraform 1.16.6, AWS provider 6.70.0) | `Success! The configuration is valid.` | [terraform-validate.txt](terraform-validate.txt) |
+| EC2 boot script | Rendered with sample values, then `bash -n` and ShellCheck 0.10.0 | No issues | [shellcheck.txt](shellcheck.txt) |
+| IaC security | Trivy 0.76.1 `config` | First scan: 10 findings. After fixes: 0 unaccepted HIGH/CRITICAL; 2 MEDIUM and 4 LOW accepted with reasons | [trivy-scan.txt](trivy-scan.txt), [triage](../architecture.md#security-scan-triage) |
+
+**What this does NOT prove:** that AWS accepts every value at apply time (e.g. instance
+class availability), that the boot script works on a real instance, or anything about
+availability or cost. Those need a deployment.
+
+---
+
 ## Not yet measured
 
 The following need deployed AWS infrastructure and have **no** results yet:
