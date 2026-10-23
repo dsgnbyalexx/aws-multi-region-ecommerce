@@ -1,0 +1,26 @@
+# Dependabot opens pull requests when dependencies have updates or security
+# fixes. Each PR runs through CI before anything is merged.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: weekly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+
+  - package-ecosystem: docker
+    directory: /app
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: terraform
+    directory: /terraform/envs/dev
+    schedule:
+      interval: weekly

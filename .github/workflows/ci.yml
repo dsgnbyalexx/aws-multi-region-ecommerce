@@ -1,0 +1,135 @@
+# Continuous Integration: runs on every push to main and on every pull request.
+# Nothing here touches AWS. It needs no cloud credentials and creates no resources.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # allows a manual run from the Actions tab
+
+# Least privilege for the automatic GITHUB_TOKEN: read the code, nothing else.
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now-pointless run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TRIVY_IMAGE: aquasec/trivy:0.76.1
+
+jobs:
+  app:
+    name: App · lint, unit & integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+
+    # A throwaway PostgreSQL 17 database that exists only for this job.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: shop
+          POSTGRES_USER: shop
+          POSTGRES_PASSWORD: ci-only-not-a-secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U shop -d shop"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGDATABASE: shop
+      PGUSER: shop
+      PGPASSWORD: ci-only-not-a-secret # disposable test database, not a real credential
+
+    steps:
+      # Actions are pinned to full commit SHAs (tags can be moved; SHAs cannot).
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install exact dependencies from the lock file
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests (fake database)
+        run: npm test
+
+      - name: Integration tests (real PostgreSQL)
+        run: npm run test:integration
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  image:
+    name: Docker image · build & vulnerability scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build -t "shop-app:${GITHUB_SHA}" app
+
+      # Fails the build on HIGH/CRITICAL vulnerabilities that have a fix available.
+      - name: Scan image with Trivy
+        run: >
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE"
+          image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
+          "shop-app:${GITHUB_SHA}"
+
+  terraform:
+    name: Terraform · fmt, validate & security scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.6
+          terraform_wrapper: false
+
+      - name: Check formatting
+        working-directory: terraform
+        run: terraform fmt -check -recursive
+
+      # -backend=false: no remote state, no AWS credentials needed.
+      # -lockfile=readonly: fail if providers don't match the committed lock file.
+      - name: Init (no backend)
+        working-directory: terraform/envs/dev
+        run: terraform init -backend=false -input=false -lockfile=readonly
+
+      - name: Validate
+        working-directory: terraform/envs/dev
+        run: terraform validate
+
+      # Fails on HIGH/CRITICAL misconfigurations that are not explicitly accepted
+      # in the code (#trivy:ignore comments, see docs/architecture.md).
+      - name: Scan Terraform with Trivy
+        run: >
+          docker run --rm -v "${GITHUB_WORKSPACE}/terraform:/src:ro" "$TRIVY_IMAGE"
+          config --severity HIGH,CRITICAL --exit-code 1
+          --skip-dirs /src/envs/dev/.terraform /src
