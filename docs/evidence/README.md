@@ -80,6 +80,15 @@ availability or cost. Those need a deployment.
 
 ---
 
+## 2026-10-23: CI pipeline (local replay)
+
+The GitHub Actions workflow passes actionlint, and all three jobs pass when replayed in
+Linux containers from a clean copy. The first image scan led to removing npm from the
+runtime image (13 → 0 vulnerabilities). Details: [ci-local-replay.md](ci-local-replay.md).
+**Not yet run on GitHub.**
+
+---
+
 ## Not yet measured
 
 The following need deployed AWS infrastructure and have **no** results yet:

@@ -19,7 +19,8 @@
 | Graceful shutdown on SIGTERM | ✅ Tested locally | [Experiment 2](docs/evidence/README.md#experiment-2-graceful-shutdown-on-sigterm) |
 | Terraform modules (VPC, ALB, ASG, RDS), statically validated, **not deployed** | ✅ Validated | [terraform-validate.txt](docs/evidence/terraform-validate.txt), [architecture](docs/architecture.md) |
 | IaC security scan (Trivy): 0 unaccepted HIGH/CRITICAL findings | ✅ Scanned | [trivy-scan.txt](docs/evidence/trivy-scan.txt), [triage](docs/architecture.md#security-scan-triage) |
-| GitHub Actions CI | ⏳ Planned | — |
+| GitHub Actions CI (tests, image scan, Terraform validate + scan) | 🧪 Replayed locally; not yet run on GitHub | [ci-local-replay.md](docs/evidence/ci-local-replay.md) |
+| Container image vulnerability scan: 0 known vulnerabilities | ✅ Scanned locally | [ci-local-replay.md](docs/evidence/ci-local-replay.md#finding-fixed-while-building-the-pipeline) |
 | AWS deployment (us-east-1) | 🗺️ Future | — |
 | Cross-region DR (us-west-2) + Route 53 failover | 🗺️ Future | — |
 
@@ -131,6 +132,25 @@ docker compose down -v      # also delete the database volume
 ├── docker-compose.yml  # Local three-tier stack
 └── docs/evidence/      # Real test output, screenshots, experiment results
 ```
+
+## Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs three parallel jobs on every
+push and pull request. None of them needs AWS credentials.
+
+| Job | What it checks |
+|---|---|
+| **app** | `npm ci`, lint, 20 unit tests, 8 integration tests against a PostgreSQL 17 service container, `npm audit` |
+| **image** | Builds the Docker image and fails on fixable HIGH/CRITICAL vulnerabilities (Trivy) |
+| **terraform** | `fmt -check`, `init` against the committed lock file, `validate`, Trivy misconfiguration scan |
+
+Pipeline hardening:
+
+- The `GITHUB_TOKEN` is read-only (`permissions: contents: read`).
+- Third-party actions are pinned to full commit SHAs.
+- `persist-credentials: false` on checkout.
+- Superseded runs are cancelled, and every job has a timeout.
+- Dependabot proposes weekly updates for npm, Docker, Terraform, and Actions.
 
 ## Known limitations (current phase)
 
