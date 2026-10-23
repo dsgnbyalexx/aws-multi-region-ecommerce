@@ -9,6 +9,14 @@ RUN npm ci --omit=dev && npm cache clean --force
 # ---- Stage 2: small runtime image ----
 FROM node:24-alpine
 ENV NODE_ENV=production
+
+# The app never runs npm/npx/yarn/corepack at runtime (dependencies were
+# installed in the build stage). Removing them shrinks the attack surface:
+# vulnerability scans found HIGH CVEs only in npm's own bundled packages.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+           /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+           /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-*
+
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
