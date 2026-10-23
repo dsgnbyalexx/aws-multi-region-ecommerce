@@ -85,7 +85,9 @@ availability or cost. Those need a deployment.
 The GitHub Actions workflow passes actionlint, and all three jobs pass when replayed in
 Linux containers from a clean copy. The first image scan led to removing npm from the
 runtime image (13 → 0 vulnerabilities). Details: [ci-local-replay.md](ci-local-replay.md).
-**Not yet run on GitHub.**
+
+**First real GitHub Actions run: all 3 jobs passed**
+([run 40036604296](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036604296)).
 
 ---
 

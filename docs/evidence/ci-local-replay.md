@@ -1,9 +1,9 @@
 # CI workflow: local replay (2026-10-23)
 
-> **Status:** the workflow in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) has
-> **not yet run on GitHub**, because the repository has not been pushed. This file records
-> a local replay of the same steps in Linux containers. A link to the first real GitHub
-> Actions run will be added here after publishing.
+> **Update 2026-10-23:** the first real GitHub Actions run
+> ([#40036604296](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036604296))
+> **passed all three jobs** (app 28 s, image 27 s, terraform 26 s, as reported by GitHub).
+> The local replay below was done before publishing and matched that result.
 
 ## How the replay was done
 

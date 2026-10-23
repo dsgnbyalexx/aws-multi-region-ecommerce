@@ -1,5 +1,7 @@
 # AWS Multi-Region E-Commerce Platform
 
+[![CI](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml/badge.svg)](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml)
+
 > A three-tier Node.js + PostgreSQL store, built to show how a cloud engineer
 > designs for availability, disaster recovery, and safe automated deployments on AWS.
 
@@ -19,7 +21,7 @@
 | Graceful shutdown on SIGTERM | ✅ Tested locally | [Experiment 2](docs/evidence/README.md#experiment-2-graceful-shutdown-on-sigterm) |
 | Terraform modules (VPC, ALB, ASG, RDS), statically validated, **not deployed** | ✅ Validated | [terraform-validate.txt](docs/evidence/terraform-validate.txt), [architecture](docs/architecture.md) |
 | IaC security scan (Trivy): 0 unaccepted HIGH/CRITICAL findings | ✅ Scanned | [trivy-scan.txt](docs/evidence/trivy-scan.txt), [triage](docs/architecture.md#security-scan-triage) |
-| GitHub Actions CI (tests, image scan, Terraform validate + scan) | 🧪 Replayed locally; not yet run on GitHub | [ci-local-replay.md](docs/evidence/ci-local-replay.md) |
+| GitHub Actions CI (tests, image scan, Terraform validate + scan) | ✅ Passing on GitHub | [first run](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036604296), [all runs](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml) |
 | Container image vulnerability scan: 0 known vulnerabilities | ✅ Scanned locally | [ci-local-replay.md](docs/evidence/ci-local-replay.md#finding-fixed-while-building-the-pipeline) |
 | AWS deployment (us-east-1) | 🗺️ Future | — |
 | Cross-region DR (us-west-2) + Route 53 failover | 🗺️ Future | — |
