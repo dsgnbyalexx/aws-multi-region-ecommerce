@@ -91,6 +91,24 @@ runtime image (13 → 0 vulnerabilities). Details: [ci-local-replay.md](ci-local
 
 ---
 
+## 2026-10-23: CI blocked an unsafe dependency update
+
+Dependabot opened [PR #1](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/pull/1)
+to change the base image from `node:24-alpine` (LTS) to `node:25-alpine` (non-LTS, end of life).
+
+| Check on PR #1 ([run 40036671491](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036671491)) | Result |
+|---|---|
+| App tests | ✅ passed |
+| Terraform | ✅ passed |
+| **Image vulnerability scan** | ❌ **failed: 4 HIGH** (CVE-2026-14456 and CVE-2026-45447 in `libssl3`/`libcrypto3`, OpenSSL 3.5.6, fixed upstream in 3.5.7/3.5.8) |
+
+The same scan on the Node 24 LTS image finds 0 vulnerabilities.
+
+**Decision:** closed the PR without merging. Added a Dependabot rule to ignore Node major
+versions, so security patches within the LTS line still arrive automatically.
+
+---
+
 ## Not yet measured
 
 The following need deployed AWS infrastructure and have **no** results yet:
