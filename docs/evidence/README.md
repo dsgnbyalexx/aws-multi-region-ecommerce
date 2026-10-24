@@ -88,7 +88,10 @@ runtime image (13 → 0 vulnerabilities). Details: [ci-local-replay.md](ci-local
 
 **First real GitHub Actions run (2026-10-23): all 3 jobs passed.** The repository was
 re-created on 2026-10-24 to reset its GitHub history, so that run is no longer viewable.
-Current runs: [GitHub Actions](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml).
+First run in the re-created repository (2026-10-24):
+[run 40043252874](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40043252874),
+all 3 jobs passed (app 29 s, image 30 s, terraform 28 s, as reported by GitHub).
+All runs: [GitHub Actions](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml).
 
 ---
 
