@@ -86,17 +86,20 @@ The GitHub Actions workflow passes actionlint, and all three jobs pass when repl
 Linux containers from a clean copy. The first image scan led to removing npm from the
 runtime image (13 → 0 vulnerabilities). Details: [ci-local-replay.md](ci-local-replay.md).
 
-**First real GitHub Actions run: all 3 jobs passed**
-([run 40036604296](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036604296)).
+**First real GitHub Actions run (2026-10-23): all 3 jobs passed.** The repository was
+re-created on 2026-10-24 to reset its GitHub history, so that run is no longer viewable.
+Current runs: [GitHub Actions](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml).
 
 ---
 
 ## 2026-10-23: CI blocked an unsafe dependency update
 
-Dependabot opened [PR #1](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/pull/1)
-to change the base image from `node:24-alpine` (LTS) to `node:25-alpine` (non-LTS, end of life).
+Dependabot opened a pull request to change the base image from `node:24-alpine` (LTS) to
+`node:25-alpine` (non-LTS, end of life). The results below were recorded from that pull
+request's CI run at the time. The PR and run are no longer viewable, because the repository
+was re-created on 2026-10-24.
 
-| Check on PR #1 ([run 40036671491](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036671491)) | Result |
+| Check on the Dependabot PR | Result |
 |---|---|
 | App tests | ✅ passed |
 | Terraform | ✅ passed |

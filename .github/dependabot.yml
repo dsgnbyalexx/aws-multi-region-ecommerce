@@ -16,8 +16,8 @@ updates:
       interval: weekly
     # Stay on the Node.js LTS line. Patch/minor updates (security fixes) still
     # arrive automatically; moving to the next LTS major is a deliberate change.
-    # Example: PR #1 proposed node:25-alpine (non-LTS, end-of-life) and failed
-    # the image vulnerability scan with 4 HIGH OpenSSL CVEs.
+    # Example: Dependabot proposed node:25-alpine (non-LTS, end-of-life), and it
+    # failed the image vulnerability scan with 4 HIGH OpenSSL CVEs.
     ignore:
       - dependency-name: node
         update-types: ["version-update:semver-major"]

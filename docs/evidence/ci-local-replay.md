@@ -1,9 +1,10 @@
 # CI workflow: local replay (2026-10-23)
 
-> **Update 2026-10-23:** the first real GitHub Actions run
-> ([#40036604296](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/runs/40036604296))
-> **passed all three jobs** (app 28 s, image 27 s, terraform 26 s, as reported by GitHub).
-> The local replay below was done before publishing and matched that result.
+> **Update 2026-10-23:** the first real GitHub Actions run **passed all three jobs**
+> (app 28 s, image 27 s, terraform 26 s, as reported by GitHub). The local replay below
+> was done before publishing and matched that result. That run is no longer viewable,
+> because the repository was re-created on 2026-10-24; see
+> [current runs](https://github.com/dsgnbyalexx/aws-multi-region-ecommerce/actions/workflows/ci.yml).
 
 ## How the replay was done
 
